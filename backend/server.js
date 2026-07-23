@@ -31,6 +31,11 @@ app.get('/', (req, res) => {
   res.json({ message: "TaskCraft API Server Active Running." });
 });
 
+if (process.env.NODE_ENV !== 'production') {
 app.listen(PORT, () => {
   console.log(`Server executing safely on port ${PORT}`);
 });
+}
+
+
+module.exports = app;
