@@ -25,7 +25,7 @@ export const TaskListView = () => {
 
   const [selectedTask, setSelectedTask] = useState(null);
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE = import.meta.env.VITE_API_URL || 'https://task-management-system-backend.onrender.com';
 
   const fetchTasks = async () => {
     setLoading(true);
