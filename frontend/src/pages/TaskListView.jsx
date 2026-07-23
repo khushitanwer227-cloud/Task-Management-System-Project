@@ -1,6 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
+
 
 export const TaskListView = () => {
   const { taskId } = useParams();
@@ -12,7 +15,7 @@ export const TaskListView = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+ 
   const [showAddForm, setShowAddForm] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDesc, setNewDesc] = useState('');
@@ -23,36 +26,20 @@ export const TaskListView = () => {
 
   const [selectedTask, setSelectedTask] = useState(null);
 
- 
-  const API_BASE = import.meta.env.VITE_API_URL || '/api';
+  const API_BASE = import.meta.env.VITE_API_URL || 'https://task-management-system-zrkr.onrender.com';
 
   const fetchTasks = async () => {
     setLoading(true);
-    setError('');
     try {
-      let url = `${API_BASE}/tasks?search=${encodeURIComponent(search)}`;
-      if (statusFilter) url += `&status=${encodeURIComponent(statusFilter)}`;
+      let url = `${API_BASE}/tasks?search=${search}`;
+      if (statusFilter) url += `&status=${statusFilter}`;
 
       const res = await fetch(url, {
-        headers: { 
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` 
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      const contentType = res.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Server returned non-JSON response');
-      }
-
       const data = await res.json();
-      if (res.ok) {
-        setTasks(data);
-      } else {
-        setError(data.message || 'Failed to fetch tasks.');
-      }
+      if (res.ok) setTasks(data);
     } catch (err) {
-      console.error('Fetch Error:', err);
       setError('Failed to fetch tasks.');
     } finally {
       setLoading(false);
@@ -60,7 +47,7 @@ export const TaskListView = () => {
   };
 
   useEffect(() => {
-    if (token) fetchTasks();
+    fetchTasks();
   }, [search, statusFilter, token]);
 
   useEffect(() => {
@@ -155,7 +142,7 @@ export const TaskListView = () => {
   };
 
   const handleDeleteTask = async (id, e) => {
-    if (e) e.stopPropagation();
+    if (e) e.stopPropagation(); 
     if (!window.confirm('Are you sure you want to delete this task record?')) return;
     try {
       const res = await fetch(`${API_BASE}/tasks/${id}`, {
@@ -176,6 +163,7 @@ export const TaskListView = () => {
     return new Date() > new Date(dueDate);
   };
 
+  
   const getInitials = (name) => {
     if (!name || name === 'Unassigned') return '👤';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -183,6 +171,8 @@ export const TaskListView = () => {
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 min-h-screen bg-slate-50">
+      
+    
       <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 mb-8 shadow-xl border border-slate-800 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl"></div>
         <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -203,8 +193,6 @@ export const TaskListView = () => {
         </div>
       </div>
 
-      {error && <div className="bg-rose-50 text-rose-600 p-3 rounded-lg text-xs mb-4 border border-rose-100 font-bold">{error}</div>}
-
       <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div className="flex flex-1 flex-wrap items-center gap-3">
           <div className="relative flex-1 max-w-xs">
@@ -222,8 +210,8 @@ export const TaskListView = () => {
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="">All Statuses</option>
-              <option value="To Do">To Do</option>
+              <option value=""> All Statuses</option>
+              <option value="To Do"> To Do</option>
               <option value="In Progress">⏳ In Progress</option>
               <option value="Done">✅ Done</option>
             </select>
@@ -277,6 +265,7 @@ export const TaskListView = () => {
         </form>
       )}
 
+      
       {loading ? (
         <div className="text-slate-400 text-xs py-16 text-center font-bold tracking-wider animate-pulse">Syncing TaskCraft enterprise database structures...</div>
       ) : (
@@ -309,6 +298,7 @@ export const TaskListView = () => {
                         onClick={() => navigate(`/dashboard/${task._id}`)}
                         className={`group transition hover:bg-slate-50/60 cursor-pointer ${taskId === task._id ? 'bg-indigo-50/50 hover:bg-indigo-50/80' : ''}`}
                       >
+
                         <td className="p-4 text-center" onClick={(e) => e.stopPropagation()}>
                           <input 
                             type="checkbox" 
@@ -317,10 +307,14 @@ export const TaskListView = () => {
                             onChange={(e) => toggleStatus(task, e)}
                           />
                         </td>
+                        
+
                         <td className="p-4 max-w-xs">
                           <p className={`font-bold text-slate-700 tracking-tight group-hover:text-indigo-950 transition ${task.status === 'Done' ? 'line-through text-slate-400 group-hover:text-slate-400' : ''}`}>{task.title}</p>
                           {task.description && <p className="text-[11px] text-slate-400 truncate mt-0.5 max-w-xs">{task.description}</p>}
                         </td>
+
+                        
                         <td className="p-4">
                           <div className="flex flex-wrap gap-1 max-w-[150px]">
                             {task.tags && task.tags.length > 0 ? (
@@ -334,6 +328,8 @@ export const TaskListView = () => {
                             )}
                           </div>
                         </td>
+
+                      
                         <td className="p-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-[10px] font-black shadow-xs">
@@ -344,6 +340,8 @@ export const TaskListView = () => {
                             </span>
                           </div>
                         </td>
+
+                      
                         <td className="p-4">
                           <span className={`inline-flex items-center px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide rounded-full border ${
                             task.status === 'Done' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
@@ -357,6 +355,8 @@ export const TaskListView = () => {
                             {task.status}
                           </span>
                         </td>
+
+                    
                         <td className="p-4">
                           <span className={`inline-block px-2.5 py-0.5 text-[10px] font-extrabold rounded ${
                             task.priority === 'High' ? 'bg-rose-100 text-rose-700 font-bold' :
@@ -366,6 +366,7 @@ export const TaskListView = () => {
                             {task.priority === 'High' ? '🔺 High' : task.priority === 'Medium' ? '🔸 Med' : '🔹 Low'}
                           </span>
                         </td>
+
                         <td className="p-4 whitespace-nowrap font-medium text-slate-500">
                           <span>
                             {task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'No Deadline'}
@@ -376,6 +377,7 @@ export const TaskListView = () => {
                             </span>
                           )}
                         </td>
+
                         <td className="p-4 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                           <div className="flex justify-center gap-2">
                             <button 
@@ -402,6 +404,7 @@ export const TaskListView = () => {
         </div>
       )}
 
+     
       {selectedTask && (
         <div 
           className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex justify-end animate-fadeIn"
@@ -411,6 +414,7 @@ export const TaskListView = () => {
             className="bg-white w-full max-w-md h-full shadow-2xl p-6 flex flex-col transform transition-transform duration-300 border-l border-slate-200 overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            
             <div className="flex justify-between items-center border-b border-slate-100 pb-4 mb-5">
               <div>
                 <h3 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Workspace Parameters</h3>
@@ -419,13 +423,14 @@ export const TaskListView = () => {
               <button onClick={() => navigate('/dashboard')} className="text-slate-400 hover:text-slate-700 text-xl font-bold transition">&times;</button>
             </div>
 
+            
             <div className="space-y-5 flex-1">
               <div>
                 <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Edit Title String</label>
                 <input 
                   type="text" 
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none"
-                  value={selectedTask.title || ''}
+                  value={selectedTask.title}
                   onChange={(e) => handleUpdateDrawerTask({ title: e.target.value })}
                 />
               </div>
@@ -446,10 +451,98 @@ export const TaskListView = () => {
                 <input 
                   type="text" 
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none"
-                  value={Array.isArray(selectedTask.tags) ? selectedTask.tags.join(', ') : ''}
-                  onChange={(e) => handleUpdateDrawerTask({ tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+                  value={selectedTask.tags ? selectedTask.tags.join(', ') : ''}
+                  placeholder="frontend, api, core"
+                  onChange={(e) => {
+                    const arrayVal = e.target.value.split(',').map(v => v.trim()).filter(Boolean);
+                    handleUpdateDrawerTask({ tags: arrayVal });
+                  }}
                 />
               </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Edit Description Specifications</label>
+                <textarea 
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none"
+                  rows="2"
+                  value={selectedTask.description || ''}
+                  onChange={(e) => handleUpdateDrawerTask({ description: e.target.value })}
+                ></textarea>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">State Transition</label>
+                  <select 
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none cursor-pointer"
+                    value={selectedTask.status}
+                    onChange={(e) => handleUpdateDrawerTask({ status: e.target.value })}
+                  >
+                    <option value="To Do">To Do</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Priority Rule</label>
+                  <select 
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none cursor-pointer"
+                    value={selectedTask.priority}
+                    onChange={(e) => handleUpdateDrawerTask({ priority: e.target.value })}
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                </div>
+              </div>
+
+
+              <div className="border-t border-slate-100 pt-4">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Checklist Milestone Targets</label>
+                <div className="space-y-2">
+                  {selectedTask.subtasks && selectedTask.subtasks.map((sub, idx) => (
+                    <div key={sub._id || idx} className="flex items-center gap-2 bg-slate-50 border border-slate-150 p-2.5 rounded-lg">
+                      <input 
+                        type="checkbox"
+                        checked={sub.isCompleted}
+                        onChange={(e) => {
+                          const updatedSubs = selectedTask.subtasks.map((s, i) => i === idx ? { ...s, isCompleted: e.target.checked } : s);
+                          handleUpdateDrawerTask({ subtasks: updatedSubs });
+                        }}
+                        className="rounded text-indigo-600 focus:ring-indigo-500 transition cursor-pointer"
+                      />
+                      <span className={`text-xs font-semibold text-slate-700 ${sub.isCompleted ? 'line-through text-slate-400' : ''}`}>{sub.text}</span>
+                    </div>
+                  ))}
+                  
+                  {(!selectedTask.subtasks || selectedTask.subtasks.length === 0) && (
+                    <button 
+                      type="button"
+                      onClick={() => handleUpdateDrawerTask({
+                        subtasks: [
+                          { text: 'Verify application build processes', isCompleted: true },
+                          { text: 'Confirm zero-downtime router parameters', isCompleted: false },
+                          { text: 'Complete production presentation ', isCompleted: false }
+                        ]
+                      })}
+                      className="inline-block mt-1 text-xs text-indigo-600 hover:text-indigo-700 font-bold tracking-tight hover:underline bg-indigo-50 px-3 py-1.5 rounded-md transition"
+                    >
+                      ＋ Bootstrap Professional Subtasks
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+           
+            <div className="border-t border-slate-100 pt-4 mt-4">
+              <button 
+                onClick={(e) => handleDeleteTask(selectedTask._id, e)}
+                className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold py-2.5 px-4 rounded-xl transition text-center"
+              >
+                🗑️ Wipe Workspace Record Permanently
+              </button>
             </div>
           </div>
         </div>
@@ -457,3 +550,7 @@ export const TaskListView = () => {
     </div>
   );
 };
+
+      
+      
+   
