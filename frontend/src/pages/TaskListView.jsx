@@ -24,7 +24,7 @@ export const TaskListView = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
  
-  const API_BASE = import.meta.env.VITE_API_URL || '';
+  const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
   const fetchTasks = async () => {
     setLoading(true);
