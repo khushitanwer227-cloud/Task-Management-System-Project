@@ -25,7 +25,10 @@ const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
 app.use('/api/tasks', taskRoutes);
+app.use('/tasks', taskRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: "TaskCraft API Server Active Running." });
