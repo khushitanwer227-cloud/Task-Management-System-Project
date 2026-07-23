@@ -24,7 +24,7 @@ mongoose.connect(process.env.DATABASE_URI || 'mongodb://127.0.0.1:27017/taskcraf
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 app.get('/', (req, res) => {
